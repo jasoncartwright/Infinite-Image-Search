@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Infinite Search Mosaic</title>
+	<style>
+		body {
+			font-family:"Arial", sans-serif;
+			font-size:12px;
+		}
+		ul {
+			padding:0;
+			margin:0;
+		}
+		li {
+			float:left;
+			list-style:none;
+		}
+		img {
+			cursor: pointer;
+			cursor: hand;
+		}
+		#startover {
+			display:none;
+			float:left;
+			clear:both;
+			margin-top:20px;
+		}
+	</style>
+</head>
+<body>
+	<form>
+		<input id="q" type="search" placeholder="Seed search query"/>
+		<input id="go" type="submit" value="Go">
+	</form>
+	<ul id="images"></ul>
+	<a id="startover" href="#">Start Over</a>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="https://www.google.com/jsapi?key=ABQIAAAA2RV8LuwIW9QgocyOL2wMFRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxQ5VpelQwrJ3FTmNqB9vNaZxJpAHA"></script>
+	<script type="text/javascript">
+		
+		google.load('search', '1');
+		
+		$("#images img").live("click",function(){
+			do_search($(this).attr("alt"))
+		})
+		
+		$("form").submit(function(){
+			if ($("#q").val()) {
+				$("form").slideUp()
+				$("#startover").slideDown()
+				do_search($("#q").val())
+			}
+			return false
+		})
+		
+		function do_search(query){
+			imageSearch.execute(query);
+		}
+		
+		function search_complete() {
+			var results = imageSearch.results;
+			if (imageSearch.results && imageSearch.results.length > 0) {
+				remove_img()
+				for (var i = 0; i < results.length; i++) {
+					var result = results[i];
+					url = result.tbUrl
+					title = result.titleNoFormatting
+					width = result.tbWidth
+					height = result.tbHeight
+					$("#images").append("<li><img src='" + url + "' alt='" + title + "' width='" + width + "' height='" + height + "'></li>")
+				}
+			}
+		}
+		
+		function remove_img() {
+			$("#images li").remove()
+		}
+		
+		$("#startover").click(function(){
+			remove_img()
+			$("#startover").slideUp()
+			$("form").slideDown()
+		})
+		
+		function on_load() {
+			imageSearch = new google.search.ImageSearch();
+			imageSearch.setSearchCompleteCallback(this, search_complete, null);
+			imageSearch.setResultSetSize(8)
+			google.search.Search.getBranding('branding');
+		}
+		
+		google.setOnLoadCallback(on_load);
+		
+	</script>
+</body>
+</html>
